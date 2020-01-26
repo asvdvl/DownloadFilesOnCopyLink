@@ -34,9 +34,11 @@
             this.textBoxPathToFolderSaveFiles = new System.Windows.Forms.TextBox();
             this.labelDescriptionPathToSaveFiles = new System.Windows.Forms.Label();
             this.labelDescriptionStartIndex = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.buttonSelectDownloadingPath = new System.Windows.Forms.Button();
             this.listBoxLog = new System.Windows.Forms.ListBox();
+            this.listBoxSucsessfulDownloads = new System.Windows.Forms.ListBox();
+            this.progressBarDownloadProgress = new System.Windows.Forms.ProgressBar();
+            this.buttonClearAllListBox = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBoxStartAndActualIndex
@@ -64,6 +66,7 @@
             this.buttonStart.TabIndex = 2;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
+            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // textBoxPathToFolderSaveFiles
             // 
@@ -91,23 +94,15 @@
             this.labelDescriptionStartIndex.TabIndex = 4;
             this.labelDescriptionStartIndex.Text = "Index";
             // 
-            // button1
+            // buttonSelectDownloadingPath
             // 
-            this.button1.Location = new System.Drawing.Point(185, 18);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(69, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "Select path";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(255, 18);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(34, 23);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "OK";
-            this.button2.UseVisualStyleBackColor = true;
+            this.buttonSelectDownloadingPath.Location = new System.Drawing.Point(185, 18);
+            this.buttonSelectDownloadingPath.Name = "buttonSelectDownloadingPath";
+            this.buttonSelectDownloadingPath.Size = new System.Drawing.Size(69, 23);
+            this.buttonSelectDownloadingPath.TabIndex = 5;
+            this.buttonSelectDownloadingPath.Text = "Select path";
+            this.buttonSelectDownloadingPath.UseVisualStyleBackColor = true;
+            this.buttonSelectDownloadingPath.Click += new System.EventHandler(this.buttonSelectDownloadingPath_Click);
             // 
             // listBoxLog
             // 
@@ -117,14 +112,41 @@
             this.listBoxLog.Size = new System.Drawing.Size(371, 95);
             this.listBoxLog.TabIndex = 7;
             // 
+            // listBoxSucsessfulDownloads
+            // 
+            this.listBoxSucsessfulDownloads.FormattingEnabled = true;
+            this.listBoxSucsessfulDownloads.Location = new System.Drawing.Point(5, 249);
+            this.listBoxSucsessfulDownloads.Name = "listBoxSucsessfulDownloads";
+            this.listBoxSucsessfulDownloads.Size = new System.Drawing.Size(371, 95);
+            this.listBoxSucsessfulDownloads.TabIndex = 8;
+            // 
+            // progressBarDownloadProgress
+            // 
+            this.progressBarDownloadProgress.Location = new System.Drawing.Point(5, 375);
+            this.progressBarDownloadProgress.Name = "progressBarDownloadProgress";
+            this.progressBarDownloadProgress.Size = new System.Drawing.Size(371, 23);
+            this.progressBarDownloadProgress.TabIndex = 9;
+            // 
+            // buttonClearAllListBox
+            // 
+            this.buttonClearAllListBox.Location = new System.Drawing.Point(5, 346);
+            this.buttonClearAllListBox.Name = "buttonClearAllListBox";
+            this.buttonClearAllListBox.Size = new System.Drawing.Size(371, 23);
+            this.buttonClearAllListBox.TabIndex = 10;
+            this.buttonClearAllListBox.Text = "clear all lists";
+            this.buttonClearAllListBox.UseVisualStyleBackColor = true;
+            this.buttonClearAllListBox.Click += new System.EventHandler(this.buttonClearAllListBox_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(381, 433);
+            this.ClientSize = new System.Drawing.Size(381, 411);
+            this.Controls.Add(this.buttonClearAllListBox);
+            this.Controls.Add(this.progressBarDownloadProgress);
+            this.Controls.Add(this.listBoxSucsessfulDownloads);
             this.Controls.Add(this.listBoxLog);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.buttonSelectDownloadingPath);
             this.Controls.Add(this.labelDescriptionStartIndex);
             this.Controls.Add(this.labelDescriptionPathToSaveFiles);
             this.Controls.Add(this.buttonStart);
@@ -147,9 +169,11 @@
         private System.Windows.Forms.TextBox textBoxPathToFolderSaveFiles;
         private System.Windows.Forms.Label labelDescriptionPathToSaveFiles;
         private System.Windows.Forms.Label labelDescriptionStartIndex;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button buttonSelectDownloadingPath;
         private System.Windows.Forms.ListBox listBoxLog;
+        private System.Windows.Forms.ListBox listBoxSucsessfulDownloads;
+        private System.Windows.Forms.ProgressBar progressBarDownloadProgress;
+        private System.Windows.Forms.Button buttonClearAllListBox;
     }
 }
 

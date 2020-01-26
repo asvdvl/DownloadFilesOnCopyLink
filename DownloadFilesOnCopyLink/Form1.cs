@@ -44,11 +44,10 @@ namespace DownloadFilesOnCopyLink
                     break;
                 case (0x0308): //Код WM_DRAWCLIPBOARD содержимое буфера изменилось можно работать
                     {
-                        
-                        if (Clipboard.ContainsText())
+                        if (CanDownload && Clipboard.ContainsText() && Uri.IsWellFormedUriString(Clipboard.GetText(), UriKind.Absolute))
                         {
                             String receivedText = Clipboard.GetText();
-                            listBoxCopyHistory.Items.Add(receivedText);
+                            listBoxCopyHistory.Items.Insert(0, receivedText);
                             downloadFile(receivedText);
                         }
                         SendMessage(hWndNextWnd, m.Msg, m.WParam, m.LParam);// Посылаем сообщение о изменении бефера дальше по цепочке
@@ -58,6 +57,9 @@ namespace DownloadFilesOnCopyLink
             base.WndProc(ref m); //обращаемся к нашему методу
         }
 
+        ///////////////////////////////////////////////////////
+        private bool CanDownload = false;
+
         private void downloadFile(String url)
         {
             string desktopPath = textBoxPathToFolderSaveFiles.Text;
@@ -66,36 +68,59 @@ namespace DownloadFilesOnCopyLink
             {
                 Uri uri = new Uri(url);
                 filename = System.IO.Path.GetFileName(uri.LocalPath);
+                filename = GetIndex() + "_" + filename;
             }
             catch(System.UriFormatException exp)
             {
-                listBoxLog.Items.Add(exp.Message);
+                listBoxLog.Items.Insert(0, exp.Message);
                 return;
             }
 
             using (WebClient wc = new WebClient())
             {
                 wc.DownloadFileCompleted += wc_DownloadFileCompleted;
+                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
                 wc.DownloadFileAsync(new Uri(url), desktopPath + "/" + filename);
+                listBoxLog.Items.Insert(0, $"downloading {filename}");
+            }
+        }
+
+        private void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            progressBarDownloadProgress.Value = e.ProgressPercentage;
+        }
+
+        private Int32 GetIndex()
+        {
+            if (Int32.TryParse(textBoxStartAndActualIndex.Text, out Int32 actualIndex))
+            {
+                actualIndex += 1;
+                textBoxStartAndActualIndex.Text = actualIndex.ToString();
+                return actualIndex - 1;
+            }
+            else
+            {
+                return 0;
             }
         }
 
         private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            progressBarDownloadProgress.Value = 0;
             if (e.Cancelled)
             {
-                listBoxLog.Items.Add("The download has been cancelled");
+                listBoxLog.Items.Insert(0, "The download has been cancelled");
                 return;
             }
 
             if (e.Error != null) // We have an error! Retry a few times, then abort.
             {
-                listBoxLog.Items.Add("An error ocurred while trying to download file");
-
+                listBoxLog.Items.Insert(0, $"error: {e.Error.Message}");
+                
                 return;
             }
-
-            listBoxLog.Items.Add("File succesfully downloaded");
+            
+            listBoxSucsessfulDownloads.Items.Insert(0, $"File succesfully downloaded");
         }
 
         public Form1()
@@ -106,12 +131,41 @@ namespace DownloadFilesOnCopyLink
         private void Form1_Load(object sender, EventArgs e)
         {
             textBoxPathToFolderSaveFiles.Text = Application.StartupPath;
-            listBoxCopyHistory.Items.Clear();
         }
 
         private void listBoxCopyHistory_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            throw new NotImplementedException();
+            downloadFile(listBoxCopyHistory.SelectedItem.ToString());
+        }
+
+        private void buttonSelectDownloadingPath_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog FBD = new FolderBrowserDialog();
+            FBD.SelectedPath = textBoxPathToFolderSaveFiles.Text;
+            if (FBD.ShowDialog() == DialogResult.OK)
+            {
+                textBoxPathToFolderSaveFiles.Text = FBD.SelectedPath;
+            }
+        }
+
+        private void buttonStart_Click(object sender, EventArgs e)
+        {
+            if(CanDownload)
+            {
+                buttonStart.Text = "Start";
+            }
+            else
+            {
+                buttonStart.Text = "Stop";
+            }
+            CanDownload = !CanDownload;
+        }
+
+        private void buttonClearAllListBox_Click(object sender, EventArgs e)
+        {
+            listBoxCopyHistory.Items.Clear();
+            listBoxLog.Items.Clear();
+            listBoxSucsessfulDownloads.Items.Clear();
         }
     }
 }
