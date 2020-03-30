@@ -13,6 +13,8 @@ using System.IO;
 
 namespace DownloadFilesOnCopyLink
 {
+
+
     public partial class Form1 : Form
     {
         [DllImport("user32.dll")]
@@ -44,13 +46,8 @@ namespace DownloadFilesOnCopyLink
                     break;
                 case (0x0308): //Код WM_DRAWCLIPBOARD содержимое буфера изменилось можно работать
                     {
-                        if (CanDownload && Clipboard.ContainsText() && Uri.IsWellFormedUriString(Clipboard.GetText(), UriKind.Absolute))
-                        {
-                            String receivedText = Clipboard.GetText();
-                            listBoxCopyHistory.Items.Insert(0, receivedText);
-                            downloadFile(receivedText);
-                        }
-                        SendMessage(hWndNextWnd, m.Msg, m.WParam, m.LParam);// Посылаем сообщение о изменении бефера дальше по цепочке
+                        CheckAndStartDownload();
+                        SendMessage(hWndNextWnd, m.Msg, m.WParam, m.LParam);// Посылаем сообщение о изменении буфера дальше по цепочке
                     }
                     break;
             }
@@ -58,39 +55,58 @@ namespace DownloadFilesOnCopyLink
         }
 
         ///////////////////////////////////////////////////////
-        private bool CanDownload = false;
 
-        private void downloadFile(String url)
+        public Int32 lvDwnID = 0;
+        public Int32 lvDwnLink = 1;
+        public Int32 lvDwnStatus = 2;
+        public Int32 lvDwnDownloadPath = 3;
+        
+
+        private void CheckAndStartDownload()
         {
-            string desktopPath = textBoxPathToFolderSaveFiles.Text;
+            if (checkBoxAllowDownload.Checked && Clipboard.ContainsText() && Uri.IsWellFormedUriString(Clipboard.GetText(), UriKind.Absolute))
+            {
+                String receivedText = Clipboard.GetText();
+                var userIndex = AddPlusOneAndGetIndex();
+                var downloadRow = new string[] {userIndex.ToString(), receivedText, "Prepairing", ""};
+                var listViewIndex = Convert.ToInt32(listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Text);
+
+                DownloadFile(receivedText, userIndex, listViewIndex);
+            }
+        }
+
+        private void DownloadFile(String url, Int32 userIndex, Int32 listViewIndex)
+        {
+            string downloadPath = textBoxPathToFolderSaveFiles.Text;
             string filename = "";
             try
             {
                 Uri uri = new Uri(url);
-                filename = System.IO.Path.GetFileName(uri.LocalPath);
-                filename = GetIndex() + "_" + filename;
+                filename = userIndex + "_" + System.IO.Path.GetFileName(uri.LocalPath);
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnDownloadPath].Text = filename;
             }
             catch(System.UriFormatException exp)
             {
                 listBoxLog.Items.Insert(0, exp.Message);
                 return;
             }
-
+            
             using (WebClient wc = new WebClient())
             {
-                wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
-                wc.DownloadFileAsync(new Uri(url), desktopPath + "/" + filename);
+                wc.DownloadFileCompleted += (sender, e) => WC_DownloadFileCompleted(sender, e, listViewIndex);
+                wc.DownloadProgressChanged += (sender, e) => WC_DownloadProgressChanged(sender, e, listViewIndex);
+                wc.DownloadFileAsync(new Uri(url), downloadPath + "/" + filename);
                 listBoxLog.Items.Insert(0, $"downloading {filename}");
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "downloading" + filename;
             }
         }
 
-        private void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private void WC_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e, int listViewIndex)
         {
-            progressBarDownloadProgress.Value = e.ProgressPercentage;
+            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.ProgressPercentage.ToString();
         }
 
-        private Int32 GetIndex()
+        private Int32 AddPlusOneAndGetIndex()
         {
             if (Int32.TryParse(textBoxStartAndActualIndex.Text, out Int32 actualIndex))
             {
@@ -104,23 +120,38 @@ namespace DownloadFilesOnCopyLink
             }
         }
 
-        private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private Int32 GetCurrentIndex()
         {
-            progressBarDownloadProgress.Value = 0;
+            if (Int32.TryParse(textBoxStartAndActualIndex.Text, out Int32 actualIndex))
+            {
+                return actualIndex;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        private void WC_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e, int listViewIndex)
+        {
+            
             if (e.Cancelled)
             {
                 listBoxLog.Items.Insert(0, "The download has been cancelled");
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "The download has been cancelled";
                 return;
             }
 
             if (e.Error != null) // We have an error! Retry a few times, then abort.
             {
                 listBoxLog.Items.Insert(0, $"error: {e.Error.Message}");
-                
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.Error.Message;
+
                 return;
             }
             
             listBoxSucsessfulDownloads.Items.Insert(0, $"File succesfully downloaded");
+            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "File succesfully downloaded";
         }
 
         public Form1()
@@ -133,39 +164,40 @@ namespace DownloadFilesOnCopyLink
             textBoxPathToFolderSaveFiles.Text = Application.StartupPath;
         }
 
-        private void listBoxCopyHistory_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void ScrollListViewDownloadsToDown()            //убрать
         {
-            downloadFile(listBoxCopyHistory.SelectedItem.ToString());
+            listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
         }
 
-        private void buttonSelectDownloadingPath_Click(object sender, EventArgs e)
+        private void ListBoxCopyHistory_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            FolderBrowserDialog FBD = new FolderBrowserDialog();
-            FBD.SelectedPath = textBoxPathToFolderSaveFiles.Text;
+            //DownloadFile(listBoxCopyHistory.SelectedItem.ToString());
+        }
+
+        private void ButtonSelectDownloadingPath_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog FBD = new FolderBrowserDialog
+            {
+                SelectedPath = textBoxPathToFolderSaveFiles.Text
+            };
             if (FBD.ShowDialog() == DialogResult.OK)
             {
                 textBoxPathToFolderSaveFiles.Text = FBD.SelectedPath;
             }
         }
 
-        private void buttonStart_Click(object sender, EventArgs e)
-        {
-            if(CanDownload)
-            {
-                buttonStart.Text = "Start";
-            }
-            else
-            {
-                buttonStart.Text = "Stop";
-            }
-            CanDownload = !CanDownload;
-        }
-
-        private void buttonClearAllListBox_Click(object sender, EventArgs e)
+        private void ButtonClearAllListBox_Click(object sender, EventArgs e)
         {
             listBoxCopyHistory.Items.Clear();
             listBoxLog.Items.Clear();
             listBoxSucsessfulDownloads.Items.Clear();
         }
+
+        private void CheckBoxAllowDownload_CheckedChanged(object sender, EventArgs e)
+        {
+            textBoxStartAndActualIndex.ReadOnly = checkBoxAllowDownload.Checked;
+            throw new NotImplementedException();
+        }
+
     }
 }
