@@ -167,11 +167,6 @@ namespace DownloadFilesOnCopyLink
             lvDwnStatus = ColumnHeaderStatius.DisplayIndex;
         }
 
-        private void ScrollListViewDownloadsToDown()
-        {
-            listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
-        }
-
         private void ButtonSelectDownloadingPath_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog FBD = new FolderBrowserDialog
