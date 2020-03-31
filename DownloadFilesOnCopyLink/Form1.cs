@@ -70,7 +70,10 @@ namespace DownloadFilesOnCopyLink
                 String receivedText = Clipboard.GetText();
                 var userIndex = AddPlusOneAndGetIndex();
                 var downloadRow = new string[] {"", userIndex.ToString(), receivedText, "Prepairing", ""};
-                var listViewIndex = listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Index;  
+                var listViewIndex = listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Index;
+                if (checkBoxEnableAutoScroll.Checked)
+                    listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
+
                 DownloadFile(receivedText, userIndex, listViewIndex);
             }
         }
@@ -188,7 +191,8 @@ namespace DownloadFilesOnCopyLink
 
         private void CheckBoxEnableAutoScroll_CheckedChanged(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            if (listViewDownloads.Items.Count > 0)
+                listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
         }
     }
 }
