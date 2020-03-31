@@ -87,7 +87,7 @@ namespace DownloadFilesOnCopyLink
             }
             catch(System.UriFormatException exp)
             {
-                listBoxLog.Items.Insert(0, exp.Message);
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = exp.Message;
                 return;
             }
             
@@ -96,7 +96,6 @@ namespace DownloadFilesOnCopyLink
                 wc.DownloadFileCompleted += (sender, e) => WC_DownloadFileCompleted(sender, e, listViewIndex);
                 wc.DownloadProgressChanged += (sender, e) => WC_DownloadProgressChanged(sender, e, listViewIndex);
                 wc.DownloadFileAsync(new Uri(url), downloadPath + "/" + filename);
-                listBoxLog.Items.Insert(0, $"downloading {filename}");
                 listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "downloading" + filename;
             }
         }
@@ -137,20 +136,16 @@ namespace DownloadFilesOnCopyLink
             
             if (e.Cancelled)
             {
-                listBoxLog.Items.Insert(0, "The download has been cancelled");
                 listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "The download has been cancelled";
                 return;
             }
 
             if (e.Error != null) // We have an error! Retry a few times, then abort.
             {
-                listBoxLog.Items.Insert(0, $"error: {e.Error.Message}");
                 listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.Error.Message;
-
                 return;
             }
             
-            listBoxSucsessfulDownloads.Items.Insert(0, $"File succesfully downloaded");
             listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "File succesfully downloaded";
         }
 
@@ -164,7 +159,7 @@ namespace DownloadFilesOnCopyLink
             textBoxPathToFolderSaveFiles.Text = Application.StartupPath;
         }
 
-        private void ScrollListViewDownloadsToDown()            //убрать
+        private void ScrollListViewDownloadsToDown()
         {
             listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
         }
@@ -186,18 +181,14 @@ namespace DownloadFilesOnCopyLink
             }
         }
 
-        private void ButtonClearAllListBox_Click(object sender, EventArgs e)
-        {
-            listBoxCopyHistory.Items.Clear();
-            listBoxLog.Items.Clear();
-            listBoxSucsessfulDownloads.Items.Clear();
-        }
-
         private void CheckBoxAllowDownload_CheckedChanged(object sender, EventArgs e)
         {
             textBoxStartAndActualIndex.ReadOnly = checkBoxAllowDownload.Checked;
-            throw new NotImplementedException();
         }
 
+        private void CheckBoxEnableAutoScroll_CheckedChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

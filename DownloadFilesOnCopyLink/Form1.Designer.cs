@@ -29,14 +29,10 @@
         private void InitializeComponent()
         {
             this.textBoxStartAndActualIndex = new System.Windows.Forms.TextBox();
-            this.listBoxCopyHistory = new System.Windows.Forms.ListBox();
             this.textBoxPathToFolderSaveFiles = new System.Windows.Forms.TextBox();
             this.labelDescriptionPathToSaveFiles = new System.Windows.Forms.Label();
             this.labelDescriptionStartIndex = new System.Windows.Forms.Label();
             this.buttonSelectDownloadingPath = new System.Windows.Forms.Button();
-            this.listBoxLog = new System.Windows.Forms.ListBox();
-            this.listBoxSucsessfulDownloads = new System.Windows.Forms.ListBox();
-            this.buttonClearAllListBox = new System.Windows.Forms.Button();
             this.listViewDownloads = new System.Windows.Forms.ListView();
             this.columnHeaderID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColumnHeaderLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -48,26 +44,17 @@
             // 
             // textBoxStartAndActualIndex
             // 
-            this.textBoxStartAndActualIndex.Location = new System.Drawing.Point(291, 20);
+            this.textBoxStartAndActualIndex.Location = new System.Drawing.Point(393, 19);
             this.textBoxStartAndActualIndex.Name = "textBoxStartAndActualIndex";
             this.textBoxStartAndActualIndex.Size = new System.Drawing.Size(45, 20);
             this.textBoxStartAndActualIndex.TabIndex = 0;
             this.textBoxStartAndActualIndex.Text = "0";
             // 
-            // listBoxCopyHistory
-            // 
-            this.listBoxCopyHistory.FormattingEnabled = true;
-            this.listBoxCopyHistory.Location = new System.Drawing.Point(5, 47);
-            this.listBoxCopyHistory.Name = "listBoxCopyHistory";
-            this.listBoxCopyHistory.Size = new System.Drawing.Size(371, 95);
-            this.listBoxCopyHistory.TabIndex = 1;
-            this.listBoxCopyHistory.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxCopyHistory_MouseDoubleClick);
-            // 
             // textBoxPathToFolderSaveFiles
             // 
             this.textBoxPathToFolderSaveFiles.Location = new System.Drawing.Point(5, 19);
             this.textBoxPathToFolderSaveFiles.Name = "textBoxPathToFolderSaveFiles";
-            this.textBoxPathToFolderSaveFiles.Size = new System.Drawing.Size(178, 20);
+            this.textBoxPathToFolderSaveFiles.Size = new System.Drawing.Size(305, 20);
             this.textBoxPathToFolderSaveFiles.TabIndex = 0;
             this.textBoxPathToFolderSaveFiles.Text = "Path to save files";
             // 
@@ -83,7 +70,7 @@
             // labelDescriptionStartIndex
             // 
             this.labelDescriptionStartIndex.AutoSize = true;
-            this.labelDescriptionStartIndex.Location = new System.Drawing.Point(289, 4);
+            this.labelDescriptionStartIndex.Location = new System.Drawing.Point(391, 3);
             this.labelDescriptionStartIndex.Name = "labelDescriptionStartIndex";
             this.labelDescriptionStartIndex.Size = new System.Drawing.Size(33, 13);
             this.labelDescriptionStartIndex.TabIndex = 4;
@@ -91,39 +78,13 @@
             // 
             // buttonSelectDownloadingPath
             // 
-            this.buttonSelectDownloadingPath.Location = new System.Drawing.Point(185, 18);
+            this.buttonSelectDownloadingPath.Location = new System.Drawing.Point(316, 17);
             this.buttonSelectDownloadingPath.Name = "buttonSelectDownloadingPath";
             this.buttonSelectDownloadingPath.Size = new System.Drawing.Size(69, 23);
             this.buttonSelectDownloadingPath.TabIndex = 5;
             this.buttonSelectDownloadingPath.Text = "Select path";
             this.buttonSelectDownloadingPath.UseVisualStyleBackColor = true;
             this.buttonSelectDownloadingPath.Click += new System.EventHandler(this.ButtonSelectDownloadingPath_Click);
-            // 
-            // listBoxLog
-            // 
-            this.listBoxLog.FormattingEnabled = true;
-            this.listBoxLog.Location = new System.Drawing.Point(5, 148);
-            this.listBoxLog.Name = "listBoxLog";
-            this.listBoxLog.Size = new System.Drawing.Size(371, 95);
-            this.listBoxLog.TabIndex = 7;
-            // 
-            // listBoxSucsessfulDownloads
-            // 
-            this.listBoxSucsessfulDownloads.FormattingEnabled = true;
-            this.listBoxSucsessfulDownloads.Location = new System.Drawing.Point(5, 249);
-            this.listBoxSucsessfulDownloads.Name = "listBoxSucsessfulDownloads";
-            this.listBoxSucsessfulDownloads.Size = new System.Drawing.Size(371, 95);
-            this.listBoxSucsessfulDownloads.TabIndex = 8;
-            // 
-            // buttonClearAllListBox
-            // 
-            this.buttonClearAllListBox.Location = new System.Drawing.Point(5, 398);
-            this.buttonClearAllListBox.Name = "buttonClearAllListBox";
-            this.buttonClearAllListBox.Size = new System.Drawing.Size(371, 23);
-            this.buttonClearAllListBox.TabIndex = 10;
-            this.buttonClearAllListBox.Text = "clear all lists";
-            this.buttonClearAllListBox.UseVisualStyleBackColor = true;
-            this.buttonClearAllListBox.Click += new System.EventHandler(this.ButtonClearAllListBox_Click);
             // 
             // listViewDownloads
             // 
@@ -135,7 +96,7 @@
             this.columnHeaderName});
             this.listViewDownloads.GridLines = true;
             this.listViewDownloads.HoverSelection = true;
-            this.listViewDownloads.Location = new System.Drawing.Point(382, 47);
+            this.listViewDownloads.Location = new System.Drawing.Point(5, 45);
             this.listViewDownloads.Name = "listViewDownloads";
             this.listViewDownloads.Size = new System.Drawing.Size(475, 351);
             this.listViewDownloads.TabIndex = 12;
@@ -165,7 +126,7 @@
             // checkBoxAllowDownload
             // 
             this.checkBoxAllowDownload.AutoSize = true;
-            this.checkBoxAllowDownload.Location = new System.Drawing.Point(338, 23);
+            this.checkBoxAllowDownload.Location = new System.Drawing.Point(440, 22);
             this.checkBoxAllowDownload.Name = "checkBoxAllowDownload";
             this.checkBoxAllowDownload.Size = new System.Drawing.Size(40, 17);
             this.checkBoxAllowDownload.TabIndex = 13;
@@ -176,12 +137,13 @@
             // checkBoxEnableAutoScroll
             // 
             this.checkBoxEnableAutoScroll.AutoSize = true;
-            this.checkBoxEnableAutoScroll.Location = new System.Drawing.Point(266, 350);
+            this.checkBoxEnableAutoScroll.Location = new System.Drawing.Point(291, 427);
             this.checkBoxEnableAutoScroll.Name = "checkBoxEnableAutoScroll";
             this.checkBoxEnableAutoScroll.Size = new System.Drawing.Size(110, 17);
             this.checkBoxEnableAutoScroll.TabIndex = 14;
             this.checkBoxEnableAutoScroll.Text = "Enable auto scroll";
             this.checkBoxEnableAutoScroll.UseVisualStyleBackColor = true;
+            this.checkBoxEnableAutoScroll.CheckedChanged += new System.EventHandler(this.CheckBoxEnableAutoScroll_CheckedChanged);
             // 
             // Form1
             // 
@@ -191,13 +153,9 @@
             this.Controls.Add(this.checkBoxEnableAutoScroll);
             this.Controls.Add(this.checkBoxAllowDownload);
             this.Controls.Add(this.listViewDownloads);
-            this.Controls.Add(this.buttonClearAllListBox);
-            this.Controls.Add(this.listBoxSucsessfulDownloads);
-            this.Controls.Add(this.listBoxLog);
             this.Controls.Add(this.buttonSelectDownloadingPath);
             this.Controls.Add(this.labelDescriptionStartIndex);
             this.Controls.Add(this.labelDescriptionPathToSaveFiles);
-            this.Controls.Add(this.listBoxCopyHistory);
             this.Controls.Add(this.textBoxPathToFolderSaveFiles);
             this.Controls.Add(this.textBoxStartAndActualIndex);
             this.Name = "Form1";
@@ -211,14 +169,10 @@
         #endregion
 
         private System.Windows.Forms.TextBox textBoxStartAndActualIndex;
-        private System.Windows.Forms.ListBox listBoxCopyHistory;
         private System.Windows.Forms.TextBox textBoxPathToFolderSaveFiles;
         private System.Windows.Forms.Label labelDescriptionPathToSaveFiles;
         private System.Windows.Forms.Label labelDescriptionStartIndex;
         private System.Windows.Forms.Button buttonSelectDownloadingPath;
-        private System.Windows.Forms.ListBox listBoxLog;
-        private System.Windows.Forms.ListBox listBoxSucsessfulDownloads;
-        private System.Windows.Forms.Button buttonClearAllListBox;
         private System.Windows.Forms.ListView listViewDownloads;
         private System.Windows.Forms.ColumnHeader columnHeaderID;
         private System.Windows.Forms.ColumnHeader ColumnHeaderLink;
