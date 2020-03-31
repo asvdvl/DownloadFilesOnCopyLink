@@ -34,10 +34,11 @@
             this.labelDescriptionStartIndex = new System.Windows.Forms.Label();
             this.buttonSelectDownloadingPath = new System.Windows.Forms.Button();
             this.listViewDownloads = new System.Windows.Forms.ListView();
+            this.columnHeaderCheck = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColumnHeaderLink = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColumnHeaderStatius = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderNameInFS = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.checkBoxAllowDownload = new System.Windows.Forms.CheckBox();
             this.checkBoxEnableAutoScroll = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
@@ -89,19 +90,27 @@
             // listViewDownloads
             // 
             this.listViewDownloads.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.listViewDownloads.CheckBoxes = true;
             this.listViewDownloads.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeaderCheck,
             this.columnHeaderID,
             this.ColumnHeaderLink,
             this.ColumnHeaderStatius,
-            this.columnHeaderName});
+            this.columnHeaderNameInFS});
+            this.listViewDownloads.FullRowSelect = true;
             this.listViewDownloads.GridLines = true;
-            this.listViewDownloads.HoverSelection = true;
-            this.listViewDownloads.Location = new System.Drawing.Point(5, 45);
+            this.listViewDownloads.HideSelection = false;
+            this.listViewDownloads.Location = new System.Drawing.Point(5, 46);
             this.listViewDownloads.Name = "listViewDownloads";
             this.listViewDownloads.Size = new System.Drawing.Size(475, 351);
             this.listViewDownloads.TabIndex = 12;
             this.listViewDownloads.UseCompatibleStateImageBehavior = false;
             this.listViewDownloads.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeaderCheck
+            // 
+            this.columnHeaderCheck.Text = "";
+            this.columnHeaderCheck.Width = 21;
             // 
             // columnHeaderID
             // 
@@ -118,10 +127,10 @@
             this.ColumnHeaderStatius.Text = "Status";
             this.ColumnHeaderStatius.Width = 66;
             // 
-            // columnHeaderName
+            // columnHeaderNameInFS
             // 
-            this.columnHeaderName.Text = "Name";
-            this.columnHeaderName.Width = 143;
+            this.columnHeaderNameInFS.Text = "Name in FS";
+            this.columnHeaderNameInFS.Width = 162;
             // 
             // checkBoxAllowDownload
             // 
@@ -137,6 +146,7 @@
             // checkBoxEnableAutoScroll
             // 
             this.checkBoxEnableAutoScroll.AutoSize = true;
+            this.checkBoxEnableAutoScroll.Enabled = false;
             this.checkBoxEnableAutoScroll.Location = new System.Drawing.Point(291, 427);
             this.checkBoxEnableAutoScroll.Name = "checkBoxEnableAutoScroll";
             this.checkBoxEnableAutoScroll.Size = new System.Drawing.Size(110, 17);
@@ -149,7 +159,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(874, 456);
+            this.ClientSize = new System.Drawing.Size(484, 401);
             this.Controls.Add(this.checkBoxEnableAutoScroll);
             this.Controls.Add(this.checkBoxAllowDownload);
             this.Controls.Add(this.listViewDownloads);
@@ -177,9 +187,10 @@
         private System.Windows.Forms.ColumnHeader columnHeaderID;
         private System.Windows.Forms.ColumnHeader ColumnHeaderLink;
         private System.Windows.Forms.ColumnHeader ColumnHeaderStatius;
-        private System.Windows.Forms.ColumnHeader columnHeaderName;
+        private System.Windows.Forms.ColumnHeader columnHeaderNameInFS;
         private System.Windows.Forms.CheckBox checkBoxAllowDownload;
         private System.Windows.Forms.CheckBox checkBoxEnableAutoScroll;
+        private System.Windows.Forms.ColumnHeader columnHeaderCheck;
     }
 }
 

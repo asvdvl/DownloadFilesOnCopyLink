@@ -55,11 +55,12 @@ namespace DownloadFilesOnCopyLink
         }
 
         ///////////////////////////////////////////////////////
-
-        public Int32 lvDwnID = 0;
-        public Int32 lvDwnLink = 1;
-        public Int32 lvDwnStatus = 2;
-        public Int32 lvDwnDownloadPath = 3;
+        
+        //Set in Form1_load function
+        public Int32 lvDwnID;
+        public Int32 lvDwnLink;
+        public Int32 lvDwnStatus;
+        public Int32 lvDwnDownloadPath;
         
 
         private void CheckAndStartDownload()
@@ -68,9 +69,8 @@ namespace DownloadFilesOnCopyLink
             {
                 String receivedText = Clipboard.GetText();
                 var userIndex = AddPlusOneAndGetIndex();
-                var downloadRow = new string[] {userIndex.ToString(), receivedText, "Prepairing", ""};
-                var listViewIndex = Convert.ToInt32(listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Text);
-
+                var downloadRow = new string[] {"", userIndex.ToString(), receivedText, "Prepairing", ""};
+                var listViewIndex = listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Index;  
                 DownloadFile(receivedText, userIndex, listViewIndex);
             }
         }
@@ -93,16 +93,16 @@ namespace DownloadFilesOnCopyLink
             
             using (WebClient wc = new WebClient())
             {
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "In queue";
                 wc.DownloadFileCompleted += (sender, e) => WC_DownloadFileCompleted(sender, e, listViewIndex);
                 wc.DownloadProgressChanged += (sender, e) => WC_DownloadProgressChanged(sender, e, listViewIndex);
                 wc.DownloadFileAsync(new Uri(url), downloadPath + "/" + filename);
-                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "downloading" + filename;
             }
         }
 
         private void WC_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e, int listViewIndex)
         {
-            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.ProgressPercentage.ToString();
+            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.ProgressPercentage.ToString() + "%";
         }
 
         private Int32 AddPlusOneAndGetIndex()
@@ -140,13 +140,14 @@ namespace DownloadFilesOnCopyLink
                 return;
             }
 
-            if (e.Error != null) // We have an error! Retry a few times, then abort.
+            if (e.Error != null)
             {
                 listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.Error.Message;
                 return;
             }
             
             listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "File succesfully downloaded";
+            
         }
 
         public Form1()
@@ -157,16 +158,15 @@ namespace DownloadFilesOnCopyLink
         private void Form1_Load(object sender, EventArgs e)
         {
             textBoxPathToFolderSaveFiles.Text = Application.StartupPath;
+            lvDwnID = columnHeaderID.DisplayIndex;
+            lvDwnLink = ColumnHeaderLink.DisplayIndex;
+            lvDwnDownloadPath = columnHeaderNameInFS.DisplayIndex;
+            lvDwnStatus = ColumnHeaderStatius.DisplayIndex;
         }
 
         private void ScrollListViewDownloadsToDown()
         {
             listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
-        }
-
-        private void ListBoxCopyHistory_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            //DownloadFile(listBoxCopyHistory.SelectedItem.ToString());
         }
 
         private void ButtonSelectDownloadingPath_Click(object sender, EventArgs e)
