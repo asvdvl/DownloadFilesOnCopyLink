@@ -13,6 +13,8 @@ using System.IO;
 
 namespace DownloadFilesOnCopyLink
 {
+
+
     public partial class Form1 : Form
     {
         [DllImport("user32.dll")]
@@ -44,13 +46,8 @@ namespace DownloadFilesOnCopyLink
                     break;
                 case (0x0308): //Код WM_DRAWCLIPBOARD содержимое буфера изменилось можно работать
                     {
-                        if (CanDownload && Clipboard.ContainsText() && Uri.IsWellFormedUriString(Clipboard.GetText(), UriKind.Absolute))
-                        {
-                            String receivedText = Clipboard.GetText();
-                            listBoxCopyHistory.Items.Insert(0, receivedText);
-                            downloadFile(receivedText);
-                        }
-                        SendMessage(hWndNextWnd, m.Msg, m.WParam, m.LParam);// Посылаем сообщение о изменении бефера дальше по цепочке
+                        CheckAndStartDownload();
+                        SendMessage(hWndNextWnd, m.Msg, m.WParam, m.LParam);// Посылаем сообщение о изменении буфера дальше по цепочке
                     }
                     break;
             }
@@ -58,39 +55,60 @@ namespace DownloadFilesOnCopyLink
         }
 
         ///////////////////////////////////////////////////////
-        private bool CanDownload = false;
+        
+        //Set in Form1_load function
+        public Int32 lvDwnID;
+        public Int32 lvDwnLink;
+        public Int32 lvDwnStatus;
+        public Int32 lvDwnDownloadPath;
+        
 
-        private void downloadFile(String url)
+        private void CheckAndStartDownload()
         {
-            string desktopPath = textBoxPathToFolderSaveFiles.Text;
+            if (checkBoxAllowDownload.Checked && Clipboard.ContainsText() && Uri.IsWellFormedUriString(Clipboard.GetText(), UriKind.Absolute))
+            {
+                String receivedText = Clipboard.GetText();
+                var userIndex = AddPlusOneAndGetIndex();
+                var downloadRow = new string[] {"", userIndex.ToString(), receivedText, "Prepairing", ""};
+                var listViewIndex = listViewDownloads.Items.Add(new ListViewItem(downloadRow)).Index;
+                if (checkBoxEnableAutoScroll.Checked)
+                    listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
+
+                DownloadFile(receivedText, userIndex, listViewIndex);
+            }
+        }
+
+        private void DownloadFile(String url, Int32 userIndex, Int32 listViewIndex)
+        {
+            string downloadPath = textBoxPathToFolderSaveFiles.Text;
             string filename = "";
             try
             {
                 Uri uri = new Uri(url);
-                filename = System.IO.Path.GetFileName(uri.LocalPath);
-                filename = GetIndex() + "_" + filename;
+                filename = userIndex + "_" + System.IO.Path.GetFileName(uri.LocalPath);
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnDownloadPath].Text = filename;
             }
             catch(System.UriFormatException exp)
             {
-                listBoxLog.Items.Insert(0, exp.Message);
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = exp.Message;
                 return;
             }
-
+            
             using (WebClient wc = new WebClient())
             {
-                wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
-                wc.DownloadFileAsync(new Uri(url), desktopPath + "/" + filename);
-                listBoxLog.Items.Insert(0, $"downloading {filename}");
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "In queue";
+                wc.DownloadFileCompleted += (sender, e) => WC_DownloadFileCompleted(sender, e, listViewIndex);
+                wc.DownloadProgressChanged += (sender, e) => WC_DownloadProgressChanged(sender, e, listViewIndex);
+                wc.DownloadFileAsync(new Uri(url), downloadPath + "/" + filename);
             }
         }
 
-        private void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private void WC_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e, int listViewIndex)
         {
-            progressBarDownloadProgress.Value = e.ProgressPercentage;
+            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.ProgressPercentage.ToString() + "%";
         }
 
-        private Int32 GetIndex()
+        private Int32 AddPlusOneAndGetIndex()
         {
             if (Int32.TryParse(textBoxStartAndActualIndex.Text, out Int32 actualIndex))
             {
@@ -104,23 +122,35 @@ namespace DownloadFilesOnCopyLink
             }
         }
 
-        private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private Int32 GetCurrentIndex()
         {
-            progressBarDownloadProgress.Value = 0;
+            if (Int32.TryParse(textBoxStartAndActualIndex.Text, out Int32 actualIndex))
+            {
+                return actualIndex;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        private void WC_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e, int listViewIndex)
+        {
+            
             if (e.Cancelled)
             {
-                listBoxLog.Items.Insert(0, "The download has been cancelled");
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "The download has been cancelled";
                 return;
             }
 
-            if (e.Error != null) // We have an error! Retry a few times, then abort.
+            if (e.Error != null)
             {
-                listBoxLog.Items.Insert(0, $"error: {e.Error.Message}");
-                
+                listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = e.Error.Message;
                 return;
             }
             
-            listBoxSucsessfulDownloads.Items.Insert(0, $"File succesfully downloaded");
+            listViewDownloads.Items[listViewIndex].SubItems[lvDwnStatus].Text = "File succesfully downloaded";
+            
         }
 
         public Form1()
@@ -131,41 +161,33 @@ namespace DownloadFilesOnCopyLink
         private void Form1_Load(object sender, EventArgs e)
         {
             textBoxPathToFolderSaveFiles.Text = Application.StartupPath;
+            lvDwnID = columnHeaderID.DisplayIndex;
+            lvDwnLink = ColumnHeaderLink.DisplayIndex;
+            lvDwnDownloadPath = columnHeaderNameInFS.DisplayIndex;
+            lvDwnStatus = ColumnHeaderStatius.DisplayIndex;
         }
 
-        private void listBoxCopyHistory_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void ButtonSelectDownloadingPath_Click(object sender, EventArgs e)
         {
-            downloadFile(listBoxCopyHistory.SelectedItem.ToString());
-        }
-
-        private void buttonSelectDownloadingPath_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog FBD = new FolderBrowserDialog();
-            FBD.SelectedPath = textBoxPathToFolderSaveFiles.Text;
+            FolderBrowserDialog FBD = new FolderBrowserDialog
+            {
+                SelectedPath = textBoxPathToFolderSaveFiles.Text
+            };
             if (FBD.ShowDialog() == DialogResult.OK)
             {
                 textBoxPathToFolderSaveFiles.Text = FBD.SelectedPath;
             }
         }
 
-        private void buttonStart_Click(object sender, EventArgs e)
+        private void CheckBoxAllowDownload_CheckedChanged(object sender, EventArgs e)
         {
-            if(CanDownload)
-            {
-                buttonStart.Text = "Start";
-            }
-            else
-            {
-                buttonStart.Text = "Stop";
-            }
-            CanDownload = !CanDownload;
+            textBoxStartAndActualIndex.ReadOnly = checkBoxAllowDownload.Checked;
         }
 
-        private void buttonClearAllListBox_Click(object sender, EventArgs e)
+        private void CheckBoxEnableAutoScroll_CheckedChanged(object sender, EventArgs e)
         {
-            listBoxCopyHistory.Items.Clear();
-            listBoxLog.Items.Clear();
-            listBoxSucsessfulDownloads.Items.Clear();
+            if (listViewDownloads.Items.Count > 0)
+                listViewDownloads.Items[listViewDownloads.Items.Count - 1].EnsureVisible();
         }
     }
 }
